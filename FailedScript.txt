@@ -1,0 +1,122 @@
+import tkinter as tk
+from tkinter import messagebox
+
+# Global finance variables
+total_income = 0.0
+total_expenses = 0.0
+savings_goal = 0.0
+
+# ---------------------- Validation Function ----------------------
+def validate_float(value):
+    """Check if the input is a valid positive float number."""
+    try:
+        val = float(value)
+        if val < 0:
+            raise ValueError
+        return val
+    except ValueError:
+        return None
+
+# ---------------------- Update Labels ----------------------
+def update_labels():
+    """Update labels to reflect current finance data."""
+    lbl_income.config(text=f"Total Income: ${total_income:.2f}")
+    lbl_expense.config(text=f"Total Expenses: ${total_expenses:.2f}")
+    lbl_savings.config(text=f"Savings Goal: ${savings_goal:.2f}")
+
+# ---------------------- Functions for Income & Expenses ----------------------
+def add_income():
+    """Add income from the input field."""
+    global total_income
+    amount = validate_float(entry_income.get())
+
+    if amount is not None:
+        total_income += amount
+        entry_income.delete(0, tk.END)  # Clear entry field
+        update_labels()
+    else:
+        messagebox.showerror("Invalid Input", "Please enter a valid positive number.")
+
+def add_expense():
+    """Add expense from the input field."""
+    global total_expenses
+    amount = validate_float(entry_expense.get())
+
+    if amount is not None:
+        total_expenses += amount
+        entry_expense.delete(0, tk.END)  # Clear entry field
+        update_labels()
+    else:
+        messagebox.showerror("Invalid Input", "Please enter a valid positive number.")
+
+# ---------------------- Savings Window ----------------------
+def open_savings_window():
+    """Open a new window to set a savings goal."""
+    savings_window = tk.Toplevel(root)
+    savings_window.title("Savings Goal")
+    savings_window.geometry("300x200")
+
+    lbl_goal = tk.Label(savings_window, text="Savings Goal ($):")
+    lbl_goal.pack(pady=5)
+    
+    entry_goal = tk.Entry(savings_window)
+    entry_goal.pack(pady=5)
+
+    lbl_months = tk.Label(savings_window, text="Months to Save:")
+    lbl_months.pack(pady=5)
+
+    entry_months = tk.Entry(savings_window)
+    entry_months.pack(pady=5)
+
+    def set_savings_goal():
+        """Calculate required monthly savings."""
+        global savings_goal
+        goal = validate_float(entry_goal.get())
+        months = validate_float(entry_months.get())
+
+        if goal is not None and months is not None and months > 0:
+            savings_goal = goal
+            monthly_savings = goal / months
+            update_labels()
+            messagebox.showinfo("Savings Plan", f"Save ${monthly_savings:.2f} per month.")
+        else:
+            messagebox.showerror("Invalid Input", "Enter valid positive numbers.")
+
+    btn_save = tk.Button(savings_window, text="Set Goal", command=set_savings_goal)
+    btn_save.pack(pady=10)
+
+# ---------------------- Main Window ----------------------
+root = tk.Tk()
+root.title("Personal Finance Tracker")
+root.geometry("400x500")
+
+# Labels
+lbl_income = tk.Label(root, text="Total Income: $0.00", font=("Arial", 12))
+lbl_expense = tk.Label(root, text="Total Expenses: $0.00", font=("Arial", 12))
+lbl_savings = tk.Label(root, text="Savings Goal: $0.00", font=("Arial", 12))
+
+lbl_income.pack(pady=5)
+lbl_expense.pack(pady=5)
+lbl_savings.pack(pady=5)
+
+# Entry Fields for Income & Expenses
+entry_income = tk.Entry(root, width=20)
+entry_income.pack(pady=5)
+btn_add_income = tk.Button(root, text="Add Income", command=add_income)
+btn_add_income.pack(pady=5)
+
+entry_expense = tk.Entry(root, width=20)
+entry_expense.pack(pady=5)
+btn_add_expense = tk.Button(root, text="Add Expense", command=add_expense)
+btn_add_expense.pack(pady=5)
+
+# Button to open savings window
+btn_savings = tk.Button(root, text="Set Savings Goal", command=open_savings_window)
+btn_savings.pack(pady=5)
+
+# Exit Button
+btn_exit = tk.Button(root, text="Exit", command=root.quit)
+btn_exit.pack(pady=5)
+
+# Run the application
+root.mainloop()
